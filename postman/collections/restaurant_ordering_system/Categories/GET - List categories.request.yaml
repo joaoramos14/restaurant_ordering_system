@@ -1,0 +1,5 @@
+$kind: http-request
+name: GET - List categories
+url: http://localhost:3000/categories
+method: GET
+order: 1787353235158

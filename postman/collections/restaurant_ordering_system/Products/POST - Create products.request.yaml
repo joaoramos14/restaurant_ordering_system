@@ -1,0 +1,18 @@
+$kind: http-request
+name: POST - Create products
+url: http://localhost:3000/products
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"categoryID\": 3,\r
+
+    \    \"name\": \"Coca-Cola 2L\",\r
+
+    \    \"description\": \"Refrigerante Coca-Cola 2 litros.\",\r
+
+    \    \"price\": 15.9\r
+
+    }"
+order: 1663644207521243
