@@ -1,0 +1,5 @@
+$kind: http-request
+name: DELETE - Delete Category
+url: http://localhost:3000/categories
+method: DELETE
+order: 4328487738870074
