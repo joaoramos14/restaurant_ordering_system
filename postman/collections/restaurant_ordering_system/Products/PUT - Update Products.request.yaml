@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/products
+method: PUT
+order: 3321174139523290

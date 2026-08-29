@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT - Update Categories
+url: http://localhost:3000/categories/dfce350d-d20c-44b1-8899-cd0091227f98
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\": \"Categoria nova - atualizado\",\r
+
+    \    \"description\": \"Teste categoria nova - atualizado\"\r
+
+    }"
+order: 4290887333535838
