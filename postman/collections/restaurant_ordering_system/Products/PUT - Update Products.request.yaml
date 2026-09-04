@@ -1,4 +1,16 @@
 $kind: http-request
-url: http://localhost:3000/products
+name: PUT - Update Products
+url: http://localhost:3000/products/d05f9072-73e1-479e-829f-24db95a7e840
 method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\": \"Bundas novas\",\r
+
+    \    \"description\": \"Bundona\",\r
+
+    \    \"price\": 15.9\r
+
+    }"
 order: 3321174139523290

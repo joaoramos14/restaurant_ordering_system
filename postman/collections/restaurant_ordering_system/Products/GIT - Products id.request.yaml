@@ -1,4 +1,5 @@
 $kind: http-request
-url: ""
+name: GIT - Products id
+url: http://localhost:3000/products/d05f9072-73e1-479e-829f-24db95a7e840
 method: GET
 order: 2740748953692105

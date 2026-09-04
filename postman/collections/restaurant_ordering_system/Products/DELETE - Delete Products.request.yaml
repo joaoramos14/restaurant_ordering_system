@@ -1,4 +1,8 @@
 $kind: http-request
-url: http://localhost:3000/products/
+name: DELETE - Delete Products
+url: http://localhost:3000/products/d05f9072-73e1-479e-829f-24db95a7e840
 method: DELETE
+body:
+  type: json
+  content: ""
 order: 3587163868850483

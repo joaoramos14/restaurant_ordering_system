@@ -6,11 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"categoryID\": 3,\r
+    \    \"name\": \"Bundas\",\r
 
-    \    \"name\": \"Coca-Cola 2L\",\r
-
-    \    \"description\": \"Refrigerante Coca-Cola 2 litros.\",\r
+    \    \"description\": \"Bundona\",\r
 
     \    \"price\": 15.9\r
 

@@ -1,14 +1,14 @@
 $kind: http-request
 name: PUT - Update Categories
-url: http://localhost:3000/categories/dfce350d-d20c-44b1-8899-cd0091227f98
+url: http://localhost:3000/categories/b5d91822-508b-47dc-a329-581c4dbb6c53
 method: PUT
 body:
   type: json
   content: "{\r
 
-    \    \"name\": \"Categoria nova - atualizado\",\r
+    \    \"name\": \"Bundas\",\r
 
-    \    \"description\": \"Teste categoria nova - atualizado\"\r
+    \    \"description\": \"Bundas enormes.\"\r
 
     }"
 order: 4290887333535838

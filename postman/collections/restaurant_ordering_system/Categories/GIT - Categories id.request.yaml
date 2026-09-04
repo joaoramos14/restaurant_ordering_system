@@ -1,5 +1,5 @@
 $kind: http-request
 name: GIT - Categories id
-url: ""
+url: http://localhost:3000/categories/a34cfff8-fd5f-4c15-ad49-1035a809e39c
 method: GET
 order: 4195875386045684
