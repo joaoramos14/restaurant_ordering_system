@@ -1,60 +1,10 @@
 import express from "express";
-import { randomUUID } from "node:crypto";
 import supabase from "./config/supabase.js";
+import Category from "./models/Category.js";
+import Product from "./models/Product.js";
 
 const app = express();
 app.use(express.json());
-
-//=======================
-// Initial data
-//=======================
-const pizzaCategoryId = randomUUID();
-const drinksCategoryId = randomUUID();
-
-
-const categories = [
-  {
-    "id": pizzaCategoryId,
-    "name": "Pizzas",
-    "description": "Pizzas com sabores clássicos, preparadas com ingredientes tradicionais."
-  },
-  {
-    "id": drinksCategoryId,
-    "name": "Bebidas",
-    "description": "Refrigerantes, sucos, águas e outras bebidas para acompanhar o pedido."
-  }
-]
-
-const products = [
-  {
-    "id": randomUUID(),
-    "categoryID": pizzaCategoryId,
-    "name": "Pizza Margherita",
-    "description": "Molho de tomate, mussarela, tomate fresco, manjericão e azeite.",
-    "price": 49.90
-  },
-  {
-    "id": randomUUID(),
-    "categoryID": pizzaCategoryId,
-    "name": "Pizza Calabresa",
-    "description": "Molho de tomate, mussarela, calabresa fatiada e cebola.",
-    "price": 54.90
-  },
-  {
-    "id": randomUUID(),
-    "categoryID": pizzaCategoryId,
-    "name": "Pizza Frango com Catupiry",
-    "description": "Molho de tomate, mussarela, frango desfiado e Catupiry.",
-    "price": 62.90
-  },
-  {
-    "id": randomUUID(),
-    "categoryID": drinksCategoryId,
-    "name": "Coca-Cola 2L",
-    "description": "Refrigerante Coca-Cola 2 litros.",
-    "price": 15.90
-  }
-]
 
 //=======================
 // Root
@@ -69,160 +19,125 @@ app.get("/", (req, res) => {
 //=======================
 // Categorias
 //=======================
-app.get("/categories",(req, res) => {
-    res.status(200).json(categories);
-});
+app.get("/categories", async (req, res) => {
+  try {
+      const categories = await Category.findAll();
+      res.status(200).json(categories);
+  } catch (error) {
+      console.error("Erro ao buscar categorias: ", error);
 
-app.get("/categories/:id",(req, res) => {
-    const category = categories.find((category) => {
-      return category.id == req.params.id;
-    });
-
-    if(!category) {
-      return res.status(404).json({
-        message: "Categoria não encontrada."
+      res.status(500).json({
+        message: "Erro ao buscar categorias.",
       });
-    }
-
-    res.status(200).json(category);
-});
-
-app.post("/categories", (req, res) => {
-  const category = {
-    id: randomUUID(),
-    ...req.body,
   }
-  categories.push(category);
-  res.status(201).json(category);
 });
 
-app.put("/categories/:id",(req, res) => {
-    const category = categories.find((category) => {
-      return category.id == req.params.id;
-    });
+app.get("/categories/:id", async (req, res) => {
+  try {
+      const category = await Category.findById(req.params.id);
+      res.status(200).json(category);
+  } catch (error) {
+      console.error("Erro ao buscar categoria: ", error);
 
-    if(!category) {
-      return res.status(404).json({
-        message: "Categoria não encontrada."
+      res.status(500).json({
+        message: "Erro ao buscar categoria.",
       });
-    }
-
-    category.name = req.body.name;
-    category.description = req.body.description;
-
-    res.status(200).json(category);
+  }
 });
 
-app.delete("/categories/:id",(req, res) => {
-    const category = categories.find((category) => {
-      return category.id == req.params.id;
-    });
+app.post("/categories", async (req, res) => {
+  try {
+      const category = await Category.create(req.body);
+      res.status(200).json(category);
+  } catch (error) {
+      console.error("Erro ao criar categoria: ", error);
 
-    if(!category) {
-      return res.status(404).json({
-        message: "Categoria não encontrada."
+      res.status(500).json({
+        message: "Erro ao criar categoria.",
       });
-    }
+  }
+});
 
-    const index = categories.indexOf(category);
-    categories.splice(index, 1);
+app.put("/categories/:id", async (req, res) => {
+  try {
+      const category = await Category.update(
+        req.params.id,
+        req.body
+      );
 
-    res.status(200).json({
-      message: "Categoria removida com sucesso.",
-    });
+      res.status(200).json(category);
+  } catch (error) {
+      console.error("Erro ao alterar categoria: ", error);
+
+      res.status(500).json({
+        message: "Erro ao alterar categoria.",
+      });
+  }
+});
+
+app.delete("/categories/:id", async (req, res) => {
+  try {
+      await Category.remove(req.params.id);
+
+      res.status(200).json({
+        message: "Categoria removida com sucesso."
+      });
+  } catch (error) {
+      console.error("Erro ao remover categoria: ", error);
+
+      res.status(404).json({
+        message: "Categoria não encontrada.",
+      });
+  }
 });
 
 //=======================
 // Produtos
 //=======================
-app.get("/products",(req, res) => {
-    res.status(200).json(products);
+app.get("/products", async (req, res) => {
+  try {
+      const products = await Product.findAll();
+      res.status(200).json(products);
+  } catch (error) {
+      console.error("Erro ao buscar produtos: ", error);
+
+      res.status(500).json({
+        message: "Erro ao buscar produtos.",
+      });
+  }
 });
 
-app.get("/products/:id",(req, res) => {
-    const product = products.find((product) => {
-      return product.id == req.params.id;
-    });
-
-    if(!product) {
-      return res.status(404).json({
-        message: "Produto não encontrada."
-      });
-    }
-
+app.get("/products/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
     res.status(200).json(product);
+  } catch (error) {
+    console.error("Erro ao buscar produto: ", error);
+
+    res.status(500).json({
+      message: "Erro ao buscar produto.",
+    })
+  }
 });
 
-app.post("/products", (req, res) => {
-  const product = {
-    id: randomUUID(),
-    ...req.body,
-  };
-  products.push(product);
-  res.status(201).json(product);
-});
-
-app.put("/products/:id",(req, res) => {
-    const product = products.find((product) => {
-      return product.id == req.params.id;
-    });
-
-    if(!product) {
-      return res.status(404).json({
-        message: "Produto não encontrada."
-      });
-    }
-
-    product.categoryID = req.body.categoryID;
-    product.name = req.body.name;
-    product.description = req.body.description;
-    product.price = req.body.price;
-
+app.post("/products", async (req, res) => {
+  try {
+    const product = await Product.create(req.body);
     res.status(200).json(product);
-});
+  } catch (error) {
+    console.error("Erro ao criar produto: ", error);
 
-app.delete("/products/:id",(req, res) => {
-    const product = products.find((product) => {
-      return product.id == req.params.id;
-    });
-
-    if(!product) {
-      return res.status(404).json({
-        message: "Produto não encontrada."
-      });
-    }
-
-    const index = products.indexOf(product);
-    products.splice(index, 1);
-
-    res.status(200).json({
-      message: "Produto removido com sucesso."
-    });
-});
-
-// ===========================
-// Supabase
-// ===========================
-app.get("/test-supabase", async (req, res) => {
-  const { data, error } = await supabase
-  .from("categories")
-  .select("*");
-
-  if (error) {
-    console.log("Erro ao consultar Supabase", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao consultar o banco de dados",
-      error: error.message,
+    res.status(500).json({
+      message: "Erro ao criar produto."
     });
   }
-
-  res.status(200).json({
-    success: true,
-    message: "Conexão com Supabase realizada com sucesso!",
-    data,
-  });
 });
+
+
+
+// ======================
+// Supabase
+// ======================
+
 
 export default app; 
