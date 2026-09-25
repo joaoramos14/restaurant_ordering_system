@@ -10,10 +10,10 @@ app.use(express.json());
 // Root
 //=======================
 app.get("/", (req, res) => {
-    res.status(200).json({
-        message: "API Restaurante",
-        version: "1.0.0"
-    });
+  res.status(200).json({
+    message: "API Restaurante",
+    version: "1.0.0"
+  });
 });
 
 //=======================
@@ -21,73 +21,73 @@ app.get("/", (req, res) => {
 //=======================
 app.get("/categories", async (req, res) => {
   try {
-      const categories = await Category.findAll();
-      res.status(200).json(categories);
+    const categories = await Category.findAll();
+    res.status(200).json(categories);
   } catch (error) {
-      console.error("Erro ao buscar categorias: ", error);
+    console.error("Erro ao buscar categorias: ", error);
 
-      res.status(500).json({
-        message: "Erro ao buscar categorias.",
-      });
+    res.status(500).json({
+      message: "Erro ao buscar categorias.",
+    });
   }
 });
 
 app.get("/categories/:id", async (req, res) => {
   try {
-      const category = await Category.findById(req.params.id);
-      res.status(200).json(category);
+    const category = await Category.findById(req.params.id);
+    res.status(200).json(category);
   } catch (error) {
-      console.error("Erro ao buscar categoria: ", error);
+    console.error("Erro ao buscar categoria: ", error);
 
-      res.status(500).json({
-        message: "Erro ao buscar categoria.",
-      });
+    res.status(500).json({
+      message: "Erro ao buscar categoria.",
+    });
   }
 });
 
 app.post("/categories", async (req, res) => {
   try {
-      const category = await Category.create(req.body);
-      res.status(200).json(category);
+    const category = await Category.create(req.body);
+    res.status(200).json(category);
   } catch (error) {
-      console.error("Erro ao criar categoria: ", error);
+    console.error("Erro ao criar categoria: ", error);
 
-      res.status(500).json({
-        message: "Erro ao criar categoria.",
-      });
+    res.status(500).json({
+      message: "Erro ao criar categoria.",
+    });
   }
 });
 
 app.put("/categories/:id", async (req, res) => {
   try {
-      const category = await Category.update(
-        req.params.id,
-        req.body
-      );
+    const category = await Category.update(
+      req.params.id,
+      req.body
+    );
 
-      res.status(200).json(category);
+    res.status(200).json(category);
   } catch (error) {
-      console.error("Erro ao alterar categoria: ", error);
+    console.error("Erro ao alterar categoria: ", error);
 
-      res.status(500).json({
-        message: "Erro ao alterar categoria.",
-      });
+    res.status(500).json({
+      message: "Erro ao alterar categoria.",
+    });
   }
 });
 
 app.delete("/categories/:id", async (req, res) => {
   try {
-      await Category.remove(req.params.id);
+    await Category.remove(req.params.id);
 
-      res.status(200).json({
-        message: "Categoria removida com sucesso."
-      });
+    res.status(200).json({
+      message: "Categoria removida com sucesso."
+    });
   } catch (error) {
-      console.error("Erro ao remover categoria: ", error);
+    console.error("Erro ao remover categoria: ", error);
 
-      res.status(404).json({
-        message: "Categoria não encontrada.",
-      });
+    res.status(404).json({
+      message: "Categoria não encontrada.",
+    });
   }
 });
 
@@ -96,14 +96,14 @@ app.delete("/categories/:id", async (req, res) => {
 //=======================
 app.get("/products", async (req, res) => {
   try {
-      const products = await Product.findAll();
-      res.status(200).json(products);
+    const products = await Product.findAll();
+    res.status(200).json(products);
   } catch (error) {
-      console.error("Erro ao buscar produtos: ", error);
+    console.error("Erro ao buscar produtos: ", error);
 
-      res.status(500).json({
-        message: "Erro ao buscar produtos.",
-      });
+    res.status(500).json({
+      message: "Erro ao buscar produtos.",
+    });
   }
 });
 
@@ -133,7 +133,38 @@ app.post("/products", async (req, res) => {
   }
 });
 
+app.put("/products/:id", async (req, res) => {
+  try {
+    const product = await Product.update(
+      req.params.id,
+      req.body
+    );
 
+    res.status(200).json(product);
+  } catch (error) {
+    console.error("Erro ao alterar produto: ", error);
+
+    res.status(500).json({
+      message: "Erro ao alterar produto.",
+    });
+  }
+});
+
+app.delete("/products/:id", async (req, res) => {
+  try {
+    await Product.remove(req.params.id);
+
+    res.status(200).json({
+      message: "Produto removido com sucesso."
+    });
+  } catch (error) {
+    console.error("Erro ao remover produto: ", error);
+
+    res.status(404).json({
+      message: "Produto não encontrado.",
+    });
+  }
+});
 
 // ======================
 // Supabase

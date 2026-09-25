@@ -2,8 +2,8 @@ import supabase from "../config/supabase.js"
 
 async function findAll() {
     const { data, error } = await supabase
-    .from("categories")
-    .select("*");
+        .from("categories")
+        .select("*");
 
     if (error) {
         throw error;
@@ -12,12 +12,12 @@ async function findAll() {
     return data;
 };
 
- async function findById(id: string) {
+async function findById(id: string) {
     const { data, error } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("id", id)
-    .single();
+        .from("categories")
+        .select("*")
+        .eq("id", id)
+        .single();
 
     if (error) {
         throw error;
@@ -26,7 +26,7 @@ async function findAll() {
     return data;
 };
 
-async function create(category:{
+async function create(category: {
     name: string;
     description: string;
     icon: string;
@@ -39,7 +39,7 @@ async function create(category:{
         .select()
         .single();
 
-    if(error) {
+    if (error) {
         throw error;
     }
 
@@ -48,14 +48,14 @@ async function create(category:{
 };
 
 async function update(
-    id: string, 
-    category:{
-    name: string;
-    description: string;
-    icon: string;
-    display_order: number;
-    active: boolean;
-}) {
+    id: string,
+    category: {
+        name: string;
+        description: string;
+        icon: string;
+        display_order: number;
+        active: boolean;
+    }) {
     const { data, error } = await supabase
         .from("categories")
         .update(category)
@@ -63,7 +63,7 @@ async function update(
         .select()
         .single();
 
-    if(error) {
+    if (error) {
         throw error;
     }
 
@@ -73,10 +73,10 @@ async function update(
 
 async function remove(id: string) {
     const { data, error } = await supabase
-    .from("categories")
-    .delete()
-    .eq("id", id)
-    .single();
+        .from("categories")
+        .delete()
+        .eq("id", id)
+        .single();
 
     if (error) {
         throw error;
@@ -85,11 +85,11 @@ async function remove(id: string) {
     return data;
 };
 
-async function searchByKeyword(keyword:string) {
+async function searchByKeyword(keyword: string) {
     const { data, error } = await supabase
-    .from ("categories")
-    .select("*")
-    .or (`name.ilike.%${keyword}%,description.ilike.%${keyword}$`);
+        .from("categories")
+        .select("*")
+        .or(`name.ilike.%${keyword}%,description.ilike.%${keyword}$`);
 }
 
 export default {
