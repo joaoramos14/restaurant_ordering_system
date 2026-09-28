@@ -1,6 +1,5 @@
 $kind: http-request
-name: PUT - Update Categories
-url: http://localhost:3000/categories/b5d91822-508b-47dc-a329-581c4dbb6c53
+url: http://localhost:3000/categories/
 method: PUT
 body:
   type: json

@@ -1,16 +1,37 @@
 $kind: http-request
-name: POST - Create products
 url: http://localhost:3000/products
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"name\": \"Bundas\",\r
+    \    \"name\": \"\",\r
 
-    \    \"description\": \"Bundona\",\r
+    \    \"description\": \"\",\r
 
-    \    \"price\": 15.9\r
+    \    \"price\": 67,\r
+
+    \    \"icon\": \"cudokomodo.jpg\",\r
+
+    \    \"display_order\": 1,\r
+
+    \    \"active\": true\r
+
+    }\r
+
+    {\r
+
+    \    \"title\": \"cu do komodo\",\r
+
+    \    \"description\": \"Cu do komodo com textura macia e sabor intenso.\",\r
+
+    \    \"price\": 67,\r
+
+    \    \"image\": \"cudokomodo.jpg\",\r
+
+    \    \"available\": true,\r
+
+    \    \"active\": true\r
 
     }"
 order: 1663644207521243

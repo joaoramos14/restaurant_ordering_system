@@ -1,5 +1,7 @@
 $kind: http-request
-name: GET - List products
 url: http://localhost:3000/products
 method: GET
+body:
+  type: json
+  content: ""
 order: 1787353296230

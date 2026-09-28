@@ -1,4 +1,4 @@
-import supabase from "../config/supabase.js"
+import supabase from "../config/supabase.js";
 
 async function findAll() {
     const { data, error } = await supabase
@@ -10,7 +10,7 @@ async function findAll() {
     }
 
     return data;
-};
+}
 
 async function findById(id: string) {
     const { data, error } = await supabase
@@ -24,7 +24,7 @@ async function findById(id: string) {
     }
 
     return data;
-};
+}
 
 async function create(category: {
     name: string;
@@ -44,8 +44,7 @@ async function create(category: {
     }
 
     return data;
-
-};
+}
 
 async function update(
     id: string,
@@ -68,8 +67,7 @@ async function update(
     }
 
     return data;
-
-};
+}
 
 async function remove(id: string) {
     const { data, error } = await supabase
@@ -83,13 +81,20 @@ async function remove(id: string) {
     }
 
     return data;
-};
+}
 
 async function searchByKeyword(keyword: string) {
     const { data, error } = await supabase
         .from("categories")
         .select("*")
-        .or(`name.ilike.%${keyword}%,description.ilike.%${keyword}$`);
+        .or(`name.ilike.%${keyword}%, description.ilike.%${keyword}%`)
+        .order("display_order", { ascending: true });
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
 }
 
 export default {
@@ -99,4 +104,4 @@ export default {
     update,
     remove,
     searchByKeyword
-};
+}
