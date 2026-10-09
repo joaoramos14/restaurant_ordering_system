@@ -1,0 +1,763 @@
+{
+    "info": {
+        "name": "restaurant_ordering_system - testes",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "0 - Root",
+            "item": [
+                {
+                    "name": "GET - Root",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna a mensagem da API\", () => {",
+                                    "  pm.expect(body).to.have.property(\"message\", \"API Restaurante\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": []
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "1 - Categories",
+            "item": [
+                {
+                    "name": "GET - List categories",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna um array\", () => pm.expect(body).to.be.an(\"array\"));",
+                                    "pm.test(\"Categorias têm os campos esperados\", () => {",
+                                    "  if (!Array.isArray(body) || body.length === 0) return;",
+                                    "  pm.expect(body[0]).to.include.all.keys(\"id\", \"name\", \"description\", \"icon\", \"display_order\", \"active\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Search categories",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "const kw = pm.collectionVariables.get(\"categoryKeyword\").toLowerCase();",
+                                    "pm.test(\"Retorna um array\", () => pm.expect(body).to.be.an(\"array\"));",
+                                    "pm.test(\"Todos os resultados contêm a palavra-chave\", () => {",
+                                    "  body.forEach(c => {",
+                                    "    const text = (c.name + \" \" + c.description).toLowerCase();",
+                                    "    pm.expect(text).to.include(kw);",
+                                    "  });",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/search/{{categoryKeyword}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "search",
+                                "{{categoryKeyword}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "POST - Create category",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200 ou 201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Categoria criada com os dados enviados\", () => {",
+                                    "  pm.expect(body).to.have.property(\"id\");",
+                                    "  pm.expect(body.name).to.eql(\"Categoria Teste Postman\");",
+                                    "  pm.expect(body.display_order).to.eql(99);",
+                                    "  pm.expect(body.active).to.eql(true);",
+                                    "});",
+                                    "if (body && body.id) pm.collectionVariables.set(\"categoryId\", body.id);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Categoria Teste Postman\",\n  \"description\": \"Categoria criada pelo Postman para teste\",\n  \"icon\": \"🧪\",\n  \"display_order\": 99,\n  \"active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Category by id",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna a categoria criada\", () => {",
+                                    "  pm.expect(body.id).to.eql(pm.collectionVariables.get(\"categoryId\"));",
+                                    "  pm.expect(body.name).to.eql(\"Categoria Teste Postman\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/{{categoryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "{{categoryId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "PUT - Update category",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Categoria foi atualizada\", () => {",
+                                    "  pm.expect(body.id).to.eql(pm.collectionVariables.get(\"categoryId\"));",
+                                    "  pm.expect(body.name).to.eql(\"Categoria Teste Postman Editada\");",
+                                    "  pm.expect(body.display_order).to.eql(98);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/{{categoryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "{{categoryId}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Categoria Teste Postman Editada\",\n  \"description\": \"Descrição editada\",\n  \"icon\": \"🧪\",\n  \"display_order\": 98,\n  \"active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Category by id (not found)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Mensagem de categoria não encontrada\", () => {",
+                                    "  pm.expect(body).to.have.property(\"message\", \"Categoria não encontrada.\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/{{notFoundId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "{{notFoundId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2 - Products",
+            "item": [
+                {
+                    "name": "POST - Create product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200 ou 201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Produto criado com os dados enviados\", () => {",
+                                    "  pm.expect(body).to.have.property(\"id\");",
+                                    "  pm.expect(body.category_id).to.eql(pm.collectionVariables.get(\"categoryId\"));",
+                                    "  pm.expect(body.title).to.eql(\"Produto Postman Teste\");",
+                                    "  pm.expect(Number(body.price)).to.eql(44.9);",
+                                    "  pm.expect(body.available).to.eql(true);",
+                                    "});",
+                                    "if (body && body.id) pm.collectionVariables.set(\"productId\", body.id);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"category_id\": \"{{categoryId}}\",\n  \"title\": \"Produto Postman Teste\",\n  \"description\": \"Produto criado pelo Postman para teste\",\n  \"price\": 44.9,\n  \"image\": \"produto-postman.jpg\",\n  \"available\": true,\n  \"active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "GET - List products",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna um array\", () => pm.expect(body).to.be.an(\"array\"));",
+                                    "pm.test(\"Produtos têm os campos esperados\", () => {",
+                                    "  pm.expect(body[0]).to.include.all.keys(\"id\", \"category_id\", \"title\", \"description\", \"price\", \"image\", \"available\", \"active\");",
+                                    "});",
+                                    "pm.test(\"Lista contém o produto criado\", () => {",
+                                    "  const ids = body.map(p => p.id);",
+                                    "  pm.expect(ids).to.include(pm.collectionVariables.get(\"productId\"));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Product by id",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna o produto criado\", () => {",
+                                    "  pm.expect(body.id).to.eql(pm.collectionVariables.get(\"productId\"));",
+                                    "  pm.expect(body.title).to.eql(\"Produto Postman Teste\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/{{productId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "{{productId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Products by category",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna um array\", () => pm.expect(body).to.be.an(\"array\"));",
+                                    "pm.test(\"Todos os produtos são da categoria\", () => {",
+                                    "  body.forEach(p => pm.expect(p.category_id).to.eql(pm.collectionVariables.get(\"categoryId\")));",
+                                    "});",
+                                    "pm.test(\"Contém o produto criado\", () => {",
+                                    "  pm.expect(body.map(p => p.id)).to.include(pm.collectionVariables.get(\"productId\"));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/category/{{categoryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "category",
+                                "{{categoryId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Products by category (empty)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Categoria sem produtos retorna array vazio\", () => {",
+                                    "  pm.expect(body).to.be.an(\"array\").that.is.empty;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/category/{{notFoundId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "category",
+                                "{{notFoundId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Search products",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Retorna um array\", () => pm.expect(body).to.be.an(\"array\"));",
+                                    "pm.test(\"Contém o produto criado\", () => {",
+                                    "  pm.expect(body.map(p => p.id)).to.include(pm.collectionVariables.get(\"productId\"));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/search/{{productKeyword}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "search",
+                                "{{productKeyword}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "PUT - Update product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Produto foi atualizado\", () => {",
+                                    "  pm.expect(body.id).to.eql(pm.collectionVariables.get(\"productId\"));",
+                                    "  pm.expect(body.title).to.eql(\"Produto Postman Teste Editado\");",
+                                    "  pm.expect(Number(body.price)).to.eql(49.9);",
+                                    "  pm.expect(body.available).to.eql(false);",
+                                    "});",
+                                    "pm.test(\"Campos não enviados foram mantidos\", () => {",
+                                    "  pm.expect(body.category_id).to.eql(pm.collectionVariables.get(\"categoryId\"));",
+                                    "  pm.expect(body.image).to.eql(\"produto-postman.jpg\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/{{productId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "{{productId}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Produto Postman Teste Editado\",\n  \"price\": 49.9,\n  \"available\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Product by id (not found)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Mensagem de produto não encontrado\", () => {",
+                                    "  pm.expect(body).to.have.property(\"message\", \"Produto não encontrado.\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/{{notFoundId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "{{notFoundId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3 - Cleanup",
+            "item": [
+                {
+                    "name": "DELETE - Delete product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Mensagem de sucesso\", () => {",
+                                    "  pm.expect(body).to.have.property(\"message\", \"Produto removido com sucesso.\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/{{productId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "{{productId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Product by id (after delete)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                                    "// O produto foi removido, então não deve mais existir."
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/products/{{productId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "products",
+                                "{{productId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "DELETE - Delete category",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "let body;",
+                                    "try { body = pm.response.json(); } catch (e) { body = undefined; }",
+                                    "pm.test(\"Mensagem de sucesso\", () => {",
+                                    "  pm.expect(body).to.have.property(\"message\", \"Categoria removida com sucesso.\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/{{categoryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "{{categoryId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "GET - Category by id (after delete)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                                    "// A categoria foi removida, então não deve mais existir."
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/categories/{{categoryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "categories",
+                                "{{categoryId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000"
+        },
+        {
+            "key": "categoryId",
+            "value": ""
+        },
+        {
+            "key": "productId",
+            "value": ""
+        },
+        {
+            "key": "notFoundId",
+            "value": "00000000-0000-0000-0000-000000000000"
+        },
+        {
+            "key": "categoryKeyword",
+            "value": "pizza"
+        },
+        {
+            "key": "productKeyword",
+            "value": "Postman"
+        }
+    ]
+}
