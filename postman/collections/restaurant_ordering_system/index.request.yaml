@@ -1,5 +1,0 @@
-$kind: http-request
-name: index
-url: http://localhost:3000/test-supabase
-method: GET
-order: 4453959341643269

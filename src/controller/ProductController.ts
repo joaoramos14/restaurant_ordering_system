@@ -1,9 +1,10 @@
 import type { Request, Response } from "express";
-import Product from "../models/Product.js";
+import ProductRepository from "../repository/ProductRepository.js";
+import { Product } from "../models/Product.js";
 
 async function getAll(req: Request, res: Response) {
     try {
-        const products = await Product.findAll();
+        const products = await ProductRepository.findAll();
 
         res.status(200).json(products);
     } catch (error) {
@@ -26,7 +27,7 @@ async function getByKeyword(req: Request<{ keyword: string }>, res: Response) {
     }
 
     try {
-        const products = await Product.searchByKeyword(keyword);
+        const products = await ProductRepository.searchByKeyword(keyword);
 
         res.status(200).json(products);
     } catch (error) {
@@ -49,7 +50,7 @@ async function getByCategory(req: Request<{ categoryId: string }>, res: Response
     }
 
     try {
-        const products = await Product.findByCategoryId(categoryId);
+        const products = await ProductRepository.findByCategoryId(categoryId);
 
         res.status(200).json(products);
     } catch (error) {
@@ -65,16 +66,16 @@ async function getById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
 
     if (!id) {
-        res.status(404).json({
+        res.status(400).json({
             message: "ID do Produto não informado."
         });
         return;
     }
 
     try {
-        const product = await Product.findById(id);
+        const product = await ProductRepository.findById(id);
 
-        res.status(200).json(product);
+        res.status(200).json(toResponse(product));
     } catch (error) {
         console.error("Erro ao buscar produto: ", error);
 
@@ -85,10 +86,28 @@ async function getById(req: Request<{ id: string }>, res: Response) {
 }
 
 async function create(req: Request, res: Response) {
-    try {
-        const product = await Product.create(req.body);
+    const { category_id, title, description, price, image, available, active } = req.body;
 
-        res.status(200).json(product);
+    if (
+        typeof category_id !== "string"
+        || typeof title !== "string"
+        || typeof description !== "string"
+        || typeof price !== "number"
+        || typeof image !== "string"
+        || typeof available !== "boolean"
+        || typeof active !== "boolean"
+    ) {
+        res.status(400).json({
+            message: "Dados obrigatórios do produto inválidos ou ausentes.",
+        });
+        return;
+    }
+
+    try {
+        const product = new Product(category_id, title, description, price, image, available, active);
+        const createdProduct = await ProductRepository.create(product);
+
+        res.status(201).json(createdProduct);
     } catch (error) {
         console.error("Erro ao criar produto: ", error);
 
@@ -100,18 +119,45 @@ async function create(req: Request, res: Response) {
 
 async function update(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
+    const { category_id, title, description, price, image, available, active } = req.body;
 
     if (!id) {
-        res.status(404).json({
+        res.status(400).json({
             message: "ID do Produto não informado."
         });
         return;
     }
 
-    try {
-        const product = await Product.update(id, req.body);
+    if (
+        (category_id !== undefined && typeof category_id !== "string")
+        || (title !== undefined && typeof title !== "string")
+        || (description !== undefined && typeof description !== "string")
+        || (price !== undefined && typeof price !== "number")
+        || (image !== undefined && typeof image !== "string")
+        || (available !== undefined && typeof available !== "boolean")
+        || (active !== undefined && typeof active !== "boolean")
+    ) {
+        res.status(400).json({
+            message: "Dados do produto inválidos.",
+        });
+        return;
+    }
 
-        res.status(200).json(product);
+    try {
+        const product = await ProductRepository.findById(id);
+
+        if (category_id !== undefined) product.changeCategoryId(category_id);
+        if (title !== undefined) product.rename(title);
+        if (description !== undefined) product.changeDescription(description);
+        if (price !== undefined) product.changePrice(price);
+        if (image !== undefined) product.changeImage(image);
+        if (available !== undefined) product.setAvailable(available);
+        if (active === true) product.activate();
+        if (active === false) product.deactivate();
+
+        const updatedProduct = await ProductRepository.update(product);
+
+        res.status(200).json(updatedProduct);
     } catch (error) {
         console.error("Erro ao atualizar produto: ", error);
 
@@ -125,14 +171,14 @@ async function remove(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
 
     if (!id) {
-        res.status(404).json({
+        res.status(400).json({
             message: "ID do Produto não informado."
         });
         return;
     }
 
     try {
-        await Product.remove(id);
+        await ProductRepository.remove(id);
 
         res.status(200).json({
             message: "Produto removido com sucesso.",
@@ -146,6 +192,19 @@ async function remove(req: Request<{ id: string }>, res: Response) {
     }
 }
 
+function toResponse(product: Product) {
+    return {
+        id: product.getId(),
+        category_id: product.getCategoryId(),
+        title: product.getTitle(),
+        description: product.getDescription(),
+        price: product.getPrice(),
+        image: product.getImage(),
+        available: product.isAvailable(),
+        active: product.isActive(),
+    };
+}
+
 export default {
     getAll,
     getById,
@@ -154,4 +213,4 @@ export default {
     create,
     update,
     remove
-}
+};

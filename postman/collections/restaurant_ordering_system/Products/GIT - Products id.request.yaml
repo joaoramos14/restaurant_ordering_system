@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:3000/products/b69adf30-2c5e-4b53-8c10-ecacaeb5fe3e
-method: GET
-order: 2740748953692105
