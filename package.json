@@ -22,9 +22,11 @@
   "license": "ISC",
   "author": "João Ramos",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "dev": "node --watch --env-file=.env --import=tsx/esm src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
@@ -36,7 +38,11 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.4",
-    "express": "^5.2.1"
+    "@supabase/supabase-js": "^2.115.0",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.0.5",
+    "express": "^5.2.1",
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.5"
   }
 }

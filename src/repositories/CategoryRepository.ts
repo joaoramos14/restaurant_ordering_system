@@ -1,5 +1,6 @@
 import supabase from "../config/supabase.js";
-import { Category } from "../models/Category.js";
+import { Category } from "../model/Category.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 async function findAll() {
     const { data, error } = await supabase
@@ -18,10 +19,14 @@ async function findById(id: string): Promise<Category> {
         .from("categories")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
     if (error) {
         throw error;
+    }
+
+    if (!data) {
+        throw new NotFoundError("Categoria não encontrada.")
     }
 
     return Category.restore(
@@ -31,7 +36,7 @@ async function findById(id: string): Promise<Category> {
         data.active,
         data.description,
         data.icon,
-    );
+    )
 }
 
 async function create(category: Category) {
@@ -56,8 +61,9 @@ async function create(category: Category) {
 
 async function update(category: Category) {
     const id = category.getId();
+
     if (!id) {
-        throw new Error("Não é possível atualizar uma categoria sem ID.");
+        throw new Error("Categoria sem ID não pode ser atualizada.")
     }
 
     const { data, error } = await supabase
@@ -86,10 +92,14 @@ async function remove(id: string) {
         .delete()
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
     if (error) {
         throw error;
+    }
+
+    if (!data) {
+        throw new NotFoundError("Categoria não encontrada.")
     }
 
     return data;
@@ -99,7 +109,7 @@ async function searchByKeyword(keyword: string) {
     const { data, error } = await supabase
         .from("categories")
         .select("*")
-        .or(`name.ilike.%${keyword}%, description.ilike.%${keyword}%`)
+        .or(`name.ilike.%${keyword}%,description.ilike.%${keyword}%`)
         .order("display_order", { ascending: true });
 
     if (error) {
@@ -115,5 +125,5 @@ export default {
     create,
     update,
     remove,
-    searchByKeyword
-};
+    searchByKeyword,
+}

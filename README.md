@@ -9,6 +9,7 @@ API REST de um sistema de pedidos para restaurante, desenvolvida na disciplina d
 - [Express 5](https://expressjs.com/)
 - [Supabase](https://supabase.com/) (PostgreSQL) via `@supabase/supabase-js`
 - [tsx](https://tsx.is/) para rodar TypeScript em desenvolvimento
+- [Vitest](https://vitest.dev/) + [Supertest](https://github.com/ladjs/supertest) para testes unitários e de integração
 
 ## Pré-requisitos
 
@@ -21,7 +22,7 @@ API REST de um sistema de pedidos para restaurante, desenvolvida na disciplina d
 # 1. Instalar as dependências
 npm install
 
-# 2. Criar o arquivo .env na raiz (veja abaixo)
+# 2. Criar o arquivo .env na raiz a partir do .env.example (veja abaixo)
 
 # 3. Subir o servidor em modo desenvolvimento
 npm run dev
@@ -31,7 +32,7 @@ O servidor sobe em `http://localhost:3000`.
 
 ### Variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto:
+Copie o `.env.example` para `.env` na raiz do projeto e preencha:
 
 ```env
 SUPABASE_URL=https://seu-projeto.supabase.co
@@ -45,6 +46,9 @@ SUPABASE_SECRET_KEY=sua-chave-secreta
 | Comando | O que faz |
 |---|---|
 | `npm run dev` | Roda com recarga automática (lê o `.env`) |
+| `npm test` | Roda todos os testes (unitários e de integração) |
+| `npm run test:watch` | Roda os testes em modo observação |
+| `npm run test:coverage` | Gera o relatório de cobertura das models |
 | `npm run build` | Compila o TypeScript para `dist/` |
 | `npm start` | Roda a versão compilada (`dist/server.js`). As variáveis do `.env` precisam estar definidas no ambiente |
 
@@ -53,21 +57,32 @@ SUPABASE_SECRET_KEY=sua-chave-secreta
 ```
 src/
 ├── config/
-│   └── supabase.ts          # Cliente do Supabase
-├── models/
-│   ├── Category.ts          # Acesso ao banco (categorias)
-│   └── Product.ts           # Acesso ao banco (produtos)
+│   └── supabase.ts                  # Cliente do Supabase
+├── errors/
+│   ├── NotFoundError.ts             # Registro não encontrado (404)
+│   └── ValidantionError.ts          # Regra de negócio violada (400)
+├── model/
+│   ├── Category.ts                  # Entidade + validações de categoria
+│   └── Product.ts                   # Entidade + validações de produto
+├── repositories/
+│   ├── CategoryRepository.ts        # Acesso ao banco (categorias)
+│   └── ProductRepository.ts         # Acesso ao banco (produtos)
 ├── controller/
 │   ├── CategoryController.ts
 │   └── ProductController.ts
 ├── routes/
 │   ├── categoryRoutes.ts
 │   └── productRoutes.ts
-├── app.ts                   # Configuração do Express e rotas
-└── server.ts                # Inicialização do servidor
+├── tests/
+│   ├── Category.test.ts             # Testes unitários
+│   ├── Category.integration.test.ts # Testes de integração
+│   ├── Product.test.ts
+│   └── Product.integration.test.ts
+├── app.ts                           # Configuração do Express e rotas
+└── server.ts                        # Inicialização do servidor
 ```
 
-Fluxo de uma requisição: **routes → controller → model → Supabase**.
+Fluxo de uma requisição: **routes → controller → model (validações) → repositories → Supabase**.
 
 ## Banco de dados
 
@@ -110,7 +125,7 @@ Fluxo de uma requisição: **routes → controller → model → Supabase**.
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/categories` | Lista todas as categorias |
-| GET | `/categories/search/:keyword` | Busca por nome ou descrição |
+| GET | `/categories/search?keyword=` | Busca por nome ou descrição |
 | GET | `/categories/:id` | Busca uma categoria pelo id |
 | POST | `/categories` | Cria uma categoria |
 | PUT | `/categories/:id` | Atualiza uma categoria |
@@ -133,8 +148,7 @@ Exemplo de corpo (POST/PUT):
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/products` | Lista todos os produtos |
-| GET | `/products/search/:keyword` | Busca por título ou descrição |
-| GET | `/products/category/:categoryId` | Lista os produtos de uma categoria |
+| GET | `/products/search?keyword=` | Busca por título ou descrição |
 | GET | `/products/:id` | Busca um produto pelo id |
 | POST | `/products` | Cria um produto |
 | PUT | `/products/:id` | Atualiza um produto (aceita campos parciais) |
@@ -148,9 +162,7 @@ Exemplo de corpo (POST):
   "title": "Pizza Calabresa",
   "description": "Pizza com molho de tomate, mussarela e calabresa",
   "price": 39.9,
-  "image": "pizza-calabresa.jpg",
-  "available": true,
-  "active": true
+  "image": "pizza-calabresa.jpg"
 }
 ```
 
@@ -159,9 +171,25 @@ Exemplo de corpo (POST):
 | Status | Quando |
 |---|---|
 | 200 | Sucesso |
-| 400 | Parâmetro obrigatório não informado |
-| 404 | Registro não encontrado (busca por id) |
-| 500 | Erro ao acessar o banco ou dados inválidos |
+| 201 | Registro criado |
+| 400 | Dados inválidos (`ValidationError`) ou palavra-chave não informada |
+| 404 | Registro não encontrado (`NotFoundError`) |
+| 500 | Erro interno ao acessar o banco |
+
+### Regras de validação
+
+**Categoria:** nome obrigatório (espaços nas pontas são removidos); `display_order` deve ser inteiro ≥ 0.
+
+**Produto:** `category_id` obrigatório e UUID válido (e a categoria precisa existir); título obrigatório (com trim); preço numérico finito ≥ 0. Todo produto nasce `available` e `active`.
+
+## Testes automatizados
+
+```bash
+npm test
+```
+
+- **Unitários** (`*.test.ts`): testam as regras das models, sem banco.
+- **Integração** (`*.integration.test.ts`): sobem a API com Supertest e usam o Supabase real configurado no `.env`. Os registros criados são removidos ao final de cada teste.
 
 ## Testes com Postman
 
