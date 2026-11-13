@@ -1,0 +1,9 @@
+$kind: collection
+description: ""
+variables:
+  baseUrl: http://localhost:3000
+  categoryId: ""
+  productId: ""
+  notFoundId: 00000000-0000-0000-0000-000000000000
+  categoryKeyword: pizza
+  productKeyword: Postman

@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/products/category/{{categoryId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Retorna um array", () => pm.expect(body).to.be.an("array"));
+      pm.test("Todos os produtos são da categoria", () => {
+        body.forEach(p => pm.expect(p.category_id).to.eql(pm.collectionVariables.get("categoryId")));
+      });
+      pm.test("Contém o produto criado", () => {
+        pm.expect(body.map(p => p.id)).to.include(pm.collectionVariables.get("productId"));
+      });
+    language: text/javascript
+order: 4000

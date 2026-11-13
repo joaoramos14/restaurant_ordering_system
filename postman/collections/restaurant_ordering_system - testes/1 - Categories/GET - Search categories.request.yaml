@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/categories/search/{{categoryKeyword}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      const kw = pm.collectionVariables.get("categoryKeyword").toLowerCase();
+      pm.test("Retorna um array", () => pm.expect(body).to.be.an("array"));
+      pm.test("Todos os resultados contêm a palavra-chave", () => {
+        body.forEach(c => {
+          const text = (c.name + " " + c.description).toLowerCase();
+          pm.expect(text).to.include(kw);
+        });
+      });
+    language: text/javascript
+order: 2000

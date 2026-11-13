@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/products/{{productId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Mensagem de sucesso", () => {
+        pm.expect(body).to.have.property("message", "Produto removido com sucesso.");
+      });
+    language: text/javascript
+order: 1000
