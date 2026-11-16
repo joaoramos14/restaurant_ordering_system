@@ -10,6 +10,7 @@ API REST de um sistema de pedidos para restaurante, desenvolvida na disciplina d
 - [Supabase](https://supabase.com/) (PostgreSQL) via `@supabase/supabase-js`
 - [tsx](https://tsx.is/) para rodar TypeScript em desenvolvimento
 - [Vitest](https://vitest.dev/) + [Supertest](https://github.com/ladjs/supertest) para testes unitários e de integração
+- [Swagger](https://swagger.io/) (`swagger-jsdoc` + `swagger-ui-express`) para documentação da API
 
 ## Pré-requisitos
 
@@ -28,7 +29,7 @@ npm install
 npm run dev
 ```
 
-O servidor sobe em `http://localhost:3000`.
+O servidor sobe em `http://localhost:3000`, e a documentação interativa da API (Swagger) fica em `http://localhost:3000/api-docs`.
 
 ### Variáveis de ambiente
 
@@ -57,7 +58,8 @@ SUPABASE_SECRET_KEY=sua-chave-secreta
 ```
 src/
 ├── config/
-│   └── supabase.ts                  # Cliente do Supabase
+│   ├── supabase.ts                  # Cliente do Supabase
+│   └── swagger.ts                   # Configuração e schemas do Swagger (OpenAPI)
 ├── errors/
 │   ├── NotFoundError.ts             # Registro não encontrado (404)
 │   └── ValidantionError.ts          # Regra de negócio violada (400)
@@ -118,7 +120,8 @@ Fluxo de uma requisição: **routes → controller → model (validações) → 
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/` | Informações da API |
+| GET | `/` | Redireciona para a documentação (`/api-docs`) |
+| GET | `/api-docs` | Documentação interativa da API (Swagger UI) |
 
 ### Categorias
 
@@ -181,6 +184,12 @@ Exemplo de corpo (POST):
 **Categoria:** nome obrigatório (espaços nas pontas são removidos); `display_order` deve ser inteiro ≥ 0.
 
 **Produto:** `category_id` obrigatório e UUID válido (e a categoria precisa existir); título obrigatório (com trim); preço numérico finito ≥ 0. Todo produto nasce `available` e `active`.
+
+## Documentação da API (Swagger)
+
+Com o servidor rodando, acesse **http://localhost:3000/api-docs** para ver e testar todos os endpoints pelo navegador.
+
+A documentação é gerada pelo `swagger-jsdoc` a partir dos comentários `@openapi` que ficam acima de cada rota em `src/routes/`. Os schemas (`Category`, `CreateCategory`, `UpdateCategory`, `Product`, `CreateProduct`, `UpdateProduct` e `Error`) ficam em `src/config/swagger.ts`.
 
 ## Testes automatizados
 

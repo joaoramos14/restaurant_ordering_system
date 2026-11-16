@@ -16,10 +16,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
-                  "let body;",
-                  "try { body = pm.response.json(); } catch (e) { body = undefined; }",
-                  "pm.test(\"Retorna a mensagem da API\", () => {",
-                  "  pm.expect(body).to.have.property(\"message\", \"Restaurant Ordering System API\");",
+                  "pm.test(\"Redireciona para a documentação Swagger\", () => {",
+                  "  pm.expect(pm.response.text()).to.include(\"Swagger UI\");",
                   "});"
                 ]
               }
