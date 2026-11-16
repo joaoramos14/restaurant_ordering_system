@@ -1,0 +1,33 @@
+$kind: http-request
+url: "{{baseUrl}}/products"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category_id": "{{categoryId}}",
+      "title": "Produto Postman Teste",
+      "description": "Produto criado pelo Postman para teste",
+      "price": 44.9,
+      "image": "produto-postman.jpg",
+      "available": true,
+      "active": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Produto criado com os dados enviados", () => {
+        pm.expect(body).to.have.property("id");
+        pm.expect(body.category_id).to.eql(pm.collectionVariables.get("categoryId"));
+        pm.expect(body.title).to.eql("Produto Postman Teste");
+        pm.expect(Number(body.price)).to.eql(44.9);
+        pm.expect(body.available).to.eql(true);
+      });
+      if (body && body.id) pm.collectionVariables.set("productId", body.id);
+    language: text/javascript
+order: 1000

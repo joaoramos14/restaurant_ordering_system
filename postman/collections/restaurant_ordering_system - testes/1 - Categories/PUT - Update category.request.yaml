@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{baseUrl}}/categories/{{categoryId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Categoria Teste Postman Editada",
+      "description": "Descrição editada",
+      "icon": "🧪",
+      "display_order": 98,
+      "active": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Categoria foi atualizada", () => {
+        pm.expect(body.id).to.eql(pm.collectionVariables.get("categoryId"));
+        pm.expect(body.name).to.eql("Categoria Teste Postman Editada");
+        pm.expect(body.display_order).to.eql(98);
+      });
+    language: text/javascript
+order: 5000

@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/products/{{productId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 404", () => pm.response.to.have.status(404));
+      // O produto foi removido, então não deve mais existir.
+    language: text/javascript
+order: 2000

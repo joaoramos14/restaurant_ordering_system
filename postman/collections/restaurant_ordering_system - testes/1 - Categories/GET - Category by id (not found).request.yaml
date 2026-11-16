@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/categories/{{notFoundId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 404", () => pm.response.to.have.status(404));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Mensagem de categoria não encontrada", () => {
+        pm.expect(body).to.have.property("message", "Categoria não encontrada.");
+      });
+    language: text/javascript
+order: 6000

@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{baseUrl}}/categories"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Categoria Teste Postman",
+      "description": "Categoria criada pelo Postman para teste",
+      "icon": "🧪",
+      "display_order": 99,
+      "active": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200 ou 201", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Categoria criada com os dados enviados", () => {
+        pm.expect(body).to.have.property("id");
+        pm.expect(body.name).to.eql("Categoria Teste Postman");
+        pm.expect(body.display_order).to.eql(99);
+        pm.expect(body.active).to.eql(true);
+      });
+      if (body && body.id) pm.collectionVariables.set("categoryId", body.id);
+    language: text/javascript
+order: 3000

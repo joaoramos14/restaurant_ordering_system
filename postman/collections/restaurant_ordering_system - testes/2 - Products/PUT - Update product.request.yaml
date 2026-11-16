@@ -1,0 +1,31 @@
+$kind: http-request
+url: "{{baseUrl}}/products/{{productId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Produto Postman Teste Editado",
+      "price": 49.9,
+      "available": false
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      let body;
+      try { body = pm.response.json(); } catch (e) { body = undefined; }
+      pm.test("Produto foi atualizado", () => {
+        pm.expect(body.id).to.eql(pm.collectionVariables.get("productId"));
+        pm.expect(body.title).to.eql("Produto Postman Teste Editado");
+        pm.expect(Number(body.price)).to.eql(49.9);
+        pm.expect(body.available).to.eql(false);
+      });
+      pm.test("Campos não enviados foram mantidos", () => {
+        pm.expect(body.category_id).to.eql(pm.collectionVariables.get("categoryId"));
+        pm.expect(body.image).to.eql("produto-postman.jpg");
+      });
+    language: text/javascript
+order: 7000

@@ -202,7 +202,10 @@ npm test
 
 ## Testes com Postman
 
-O arquivo `postman-collection.json` contém uma coleção com testes automáticos para todos os endpoints.
+A coleção com testes automáticos para todos os endpoints está disponível em dois formatos, com o mesmo conteúdo:
+
+- `postman-collection.json`: arquivo único, para importar no Postman.
+- `postman/collections/restaurant_ordering_system - testes/`: formato de pastas do Postman (uma requisição por arquivo `.yaml`), usado na integração do Postman com o Git.
 
 1. No Postman, clique em **Import** e selecione `postman-collection.json`.
 2. Com o servidor rodando, abra a coleção, clique em **Run** e execute tudo em ordem.
